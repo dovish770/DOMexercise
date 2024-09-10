@@ -4,7 +4,8 @@ const headTable = document.getElementById(`header-table`)
 let input = document.getElementById(`new-to-do`);
 let todos = JSON.parse(localStorage.getItem(`todos`)) || [];
 create.addEventListener(`click`, ()=> createToDo());
-renderPage();
+document.getElementById('btn-sort').addEventListener('click', ()=>sort())
+renderPage(todos);
 
 
 function createId(){
@@ -23,7 +24,7 @@ function createToDo(){
     };
     todos.push(newtodo);
     localStorage.setItem(`todos`, JSON.stringify(todos));
-    renderPage();
+    renderPage(todos);
     input.value="";
 }
 
@@ -56,10 +57,10 @@ function addRow(task, idx){
     input.value = '';
 };
 
-function renderPage(){
+function renderPage(arrToShow){
     table.innerHTML = "";
     table.appendChild(headTable)
-    todos.forEach((task, idx) => {
+    arrToShow.forEach((task, idx) => {
         addRow(task, idx)
     });
     isTable();
@@ -68,9 +69,9 @@ function renderPage(){
 function createActions(task){
     const btnDone = createBTNDone(task.id);
 
-    const btnUpdate = createBTNDelete(task.id);
+    const btnUpdate = createBTNUpdate(task.id);
 
-    const btnDelete = createBTNUpdate(task.id);
+    const btnDelete = createBTNDelete(task.id);
 
     const div = document.createElement(`div`);
 
@@ -109,7 +110,7 @@ function Done(id){
     if (task) {
         task.status = `DONE`;
         localStorage.setItem(`todos`, JSON.stringify(todos));
-        renderPage();
+        renderPage(todos);
     }
 }
 function Update(id){
@@ -117,13 +118,13 @@ function Update(id){
     if (task&&input.value!="") {
         task.content = input.value;
         localStorage.setItem(`todos`, JSON.stringify(todos));
-        renderPage();
+        renderPage(todos);
     }
 }
 function Delete(id){
     todos = todos.filter(x => x.id != id);   
     localStorage.setItem(`todos`, JSON.stringify(todos));
-    renderPage();
+    renderPage(todos);
 }
 
 function isTable(){
@@ -133,6 +134,34 @@ function isTable(){
     else{
         headTable.style.display = `none`;
     }
+}
+
+function sort(){
+    const sortMethod = document.getElementById('sort');
+    if(sortMethod.value==`ascending`){
+        showSortedAscending();
+    }
+    if(sortMethod.value==`descending`){
+        showSortedDescending()
+    }
+}
+
+function showSortedDescending(){
+    const sortedArr = sortDescending();
+    renderPage(sortedArr);
+}
+function showSortedAscending(){
+    const sortedArr = sortAscending();
+    renderPage(sortedArr);
+}
+
+function sortDescending(){
+    const tasksSorted = todos.sort((a, b) => a.content.localeCompare(b.content));
+    return tasksSorted
+}
+function sortAscending(){
+    const tasksSorted = todos.sort((a, b) => a.content.localeCompare(b.content)).reverse();
+    return tasksSorted
 }
 
 
